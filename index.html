@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>החנוכייה של הגן | צהר הלב</title>
+<meta name="description" content="כל אשת צוות בצהר הלב בוחרת משחק אחד לגן שלה, עד 70 ש&quot;ח.">
+<meta property="og:title" content="החנוכייה של הגן | צהר הלב מרחב דרום">
+<meta property="og:description" content="כל אשת צוות בוחרת משחק אחד לגן שלה. צהר הלב מזמינה, ואתן מדליקות את החנוכייה.">
+<link rel="icon" href="img/logo.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="wrap" id="app">
+  <header class="top"><img src="img/logo.png" alt="צהר הלב"><div class="brand">צהר הלב<span>מרחב דרום</span></div></header>
+
+  <section id="s-hero">
+    <h1>החנוכייה <span class="hl">של הגן</span></h1>
+    <p class="lead" id="mission"></p>
+    <div id="heroChan" aria-hidden="true"></div>
+    <p class="center"><span class="pill" id="deadline"></span></p>
+    <button class="btn block" id="start" type="button">בואי נבחר משחק</button>
+    <ol class="card small" style="padding-inline-start:36px">
+      <li>נכנסים עם השם ו-4 ספרות אחרונות של תעודת הזהות</li>
+      <li>בוחרים עיר ואת הגן שלך (הגננת פותחת אותו קודם)</li>
+      <li>בוחרים משחק אחד מהקטלוג, ומדליקים נר בחנוכייה של הגן</li>
+    </ol>
+  </section>
+
+  <section id="s-id" class="hidden">
+    <div class="msg info hidden" id="teacherBanner">מצב גננת: את בוחרת בשם עובדת מהצוות של הגן</div>
+    <form class="card" id="idForm" novalidate>
+      <h2 id="idTitle">קודם כל, מי את?</h2>
+      <div class="row2">
+        <label class="field"><span>שם פרטי</span><input name="first" autocomplete="given-name" required maxlength="40"></label>
+        <label class="field"><span>שם משפחה</span><input name="last" autocomplete="family-name" required maxlength="40"></label>
+      </div>
+      <label class="field"><span>4 ספרות אחרונות של תעודת הזהות</span>
+        <input name="id4" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="off" required dir="ltr" style="text-align:right">
+        <small>רק כדי לוודא שכל אחת בוחרת פעם אחת. לא מבקשים את המספר המלא.</small></label>
+      <label class="field"><span>תפקיד</span><select name="role" required></select></label>
+      <div id="ganPick">
+        <label class="field"><span>עיר</span><select name="city" required></select></label>
+        <label class="field"><span>הגן שלך</span><select name="gan" required disabled><option value="">קודם בוחרים עיר</option></select>
+          <small id="ganHint"></small></label>
+      </div>
+      <div class="msg err" id="idErr" role="alert"></div>
+      <button class="btn block" type="submit" id="idSubmit">לקטלוג המשחקים</button>
+    </form>
+  </section>
+
+  <section id="s-cat" class="hidden">
+    <div class="ganbar"><div class="in">
+      <div class="mini" id="barChan"></div>
+      <div class="t"><b id="barGan"></b><span id="barProg"></span></div>
+      <button class="btn ghost small" id="back" type="button">חזרה</button>
+    </div></div>
+    <div class="msg info" id="catNote"></div>
+    <div class="msg err" id="catErr" role="alert"></div>
+    <div id="catalog"></div>
+  </section>
+
+  <section id="s-done" class="hidden center">
+    <h1>הדלקת <span class="hl">נר!</span></h1>
+    <div id="doneChan"></div>
+    <p class="progress-line" id="doneProg"></p>
+    <div class="card">
+      <p>בחרת את <b id="doneGame"></b> <b id="doneGan"></b>.</p>
+      <p class="small muted" id="doneNote">אפשר להחליף משחק עד שהגננת סוגרת את הסל. מרים מזמינה את כל המשחקים, והם יגיעו לגן לפני חנוכה.</p>
+      <div class="actions" style="justify-content:center">
+        <button class="btn teal" id="shareBtn" type="button">תמונה לסטטוס</button>
+        <a class="btn ghost" id="waBtn" target="_blank" rel="noopener">שליחה בוואטסאפ</a>
+      </div>
+      <div class="actions" style="justify-content:center">
+        <button class="btn ghost small" id="changeBtn" type="button">החלפת משחק</button>
+        <a class="btn ghost small" href="wall.html">לקיר החנוכיות</a>
+        <a class="btn ghost small hidden" id="adminBack">חזרה לניהול הגן</a>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">צהר הלב · מרחב דרום · חנוכה תשפ״ז<br>שאלות? מרים: 052-7609153 · miryamti@tzlev.com</p>
+</main>
+
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="box">
+    <img id="mImg" alt="" referrerpolicy="no-referrer">
+    <h2 id="mTitle"></h2>
+    <p><b id="mPrice"></b> · <span id="mSup"></span></p>
+    <p id="mQ"></p>
+    <div class="msg err" id="mErr" role="alert"></div>
+    <div class="actions" style="justify-content:center">
+      <button class="btn" id="mYes" type="button">כן, זה המשחק שלי</button>
+      <button class="btn ghost" id="mNo" type="button">עוד לא</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/logic.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/staff.js"></script>
+</body>
+</html>

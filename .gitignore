@@ -1,0 +1,6 @@
+# This folder is the public site. Never commit data files with names or IDs.
+*.xlsx
+*.xls
+*.csv
+*.pdf
+*.docx

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>קיר החנוכיות | צהר הלב</title>
+<meta property="og:title" content="קיר החנוכיות | צהר הלב מרחב דרום">
+<meta property="og:description" content="כל גן מדליק חנוכייה: כל אשת צוות בוחרת משחק לגן.">
+<link rel="icon" href="img/logo.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="wrap wide">
+  <header class="top"><img src="img/logo.png" alt="צהר הלב"><div class="brand">צהר הלב<span>מרחב דרום</span></div></header>
+  <h1>קיר <span class="hl">החנוכיות</span></h1>
+  <p class="lead">כל אשת צוות שבוחרת משחק לגן מדליקה נר. איזה גן ידליק ראשון את כל החנוכייה?</p>
+  <div class="stats">
+    <div class="stat"><b id="tGames">0</b><span>משחקים נבחרו</span></div>
+    <div class="stat"><b id="tGans">0</b><span>גנים פתחו</span></div>
+    <div class="stat"><b id="tFull">0</b><span>חנוכיות דולקות</span></div>
+  </div>
+  <p class="center"><span class="pill" id="left"></span></p>
+  <div id="cities"></div>
+  <p class="empty hidden" id="none">עוד אין גנים פתוחים. הגננות פותחות את הגנים בימים הקרובים.</p>
+  <p class="center"><a class="btn" href="index.html">גם אני רוצה לבחור משחק</a></p>
+  <p class="foot">מתעדכן לבד כל דקה · צהר הלב · מרחב דרום · חנוכה תשפ״ז</p>
+</main>
+<script src="js/config.js"></script>
+<script src="js/logic.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script>
+(function () {
+  var $ = UI.$;
+  function daysLeft() {
+    var ms = new Date(window.CONFIG.DEADLINE_ISO) - new Date();
+    if (ms <= 0) return 'הבחירה נסגרה. המשחקים בדרך לגנים!';
+    var d = Math.ceil(ms / 86400000);
+    return d === 1 ? 'היום היום האחרון לבחירה!' : 'נשארו עוד ' + d + ' ימים לבחירה';
+  }
+  async function load() {
+    var r = await API.call('listGans', {});
+    if (!r.ok) return;
+    var full = r.gans.filter(function (g) { return g.chosen >= g.staff; }).length;
+    $('#tGames').textContent = r.total;
+    $('#tGans').textContent = r.gans.length;
+    $('#tFull').textContent = full;
+    $('#left').textContent = daysLeft();
+    UI.show('#none', !r.gans.length);
+    var by = {};
+    r.gans.forEach(function (g) { (by[g.city] = by[g.city] || []).push(g); });
+    var order = Logic.CITIES.filter(function (c) { return by[c]; });
+    $('#cities').innerHTML = order.map(function (c) {
+      var list = by[c].slice().sort(function (a, b) { return (b.chosen / b.staff) - (a.chosen / a.staff); });
+      return '<h2 class="city">' + UI.esc(c) + '</h2><div class="wallgrid">' + list.map(function (g) {
+        var isFull = g.chosen >= g.staff;
+        return '<div class="gancard' + (isFull ? ' full' : '') + '">' + UI.chanukiah(UI.litFor(g.chosen, g.staff)) +
+          '<b>' + UI.esc(g.name) + '</b><span>' + (isFull ? 'כל הצוות בחר! 🕎' : g.chosen + ' מתוך ' + g.staff) + '</span></div>';
+      }).join('') + '</div>';
+    }).join('');
+  }
+  load();
+  setInterval(load, 60000);
+})();
+</script>
+</body>
+</html>

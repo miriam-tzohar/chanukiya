@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>סקירת הקטלוג | החנוכייה של הגן</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="img/logo.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="wrap wide">
+  <header class="top"><img src="img/logo.png" alt="צהר הלב"><div class="brand">צהר הלב<span>מרחב דרום</span></div></header>
+  <h1>סקירת <span class="hl">הקטלוג</span></h1>
+  <p class="lead" id="sum"></p>
+  <div class="card small" id="bySup"></div>
+  <div id="catalog"></div>
+</main>
+<script src="js/config.js"></script>
+<script src="js/logic.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script>
+API.loadCatalog().then(function (cat) {
+  var sup = {};
+  cat.items.forEach(function (i) { sup[i.s] = (sup[i.s] || 0) + 1; });
+  var prices = cat.items.map(function (i) { return i.p; });
+  document.getElementById('sum').textContent = cat.items.length + ' משחקים, כולם עד ' + cat.max_price + ' ש"ח (' +
+    Math.min.apply(null, prices) + '-' + Math.max.apply(null, prices) + ' ש"ח). עודכן ' + cat.version.split('-').reverse().join('.');
+  document.getElementById('bySup').innerHTML = Object.keys(sup).map(function (s) {
+    return '<b>' + UI.esc(cat.suppliers[s].name) + '</b>: ' + sup[s] + ' משחקים · <a href="' + UI.esc(cat.suppliers[s].site) + '" target="_blank" rel="noopener">לאתר</a>';
+  }).join('<br>') + '<br><span class="muted">פוקסמיינד: לא נכלל, כי באתר שלהם אין מחירים ואין קנייה (קטלוג בלבד).</span>';
+  UI.mountCatalog(document.getElementById('catalog'), cat, { readOnly: true });
+});
+</script>
+</body>
+</html>
