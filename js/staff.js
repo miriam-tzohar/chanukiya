@@ -53,10 +53,17 @@
       return '<option value="' + UI.esc(g.id) + '"' + (g.closed ? ' disabled' : '') + '>' + UI.esc(g.name) + (g.closed ? ' (הסל נסגר)' : '') + '</option>';
     }).join('');
     f.gan.disabled = false;
-    $('#ganHint').textContent = 'לא רואה את הגן שלך? כנראה שהגננת עוד לא פתחה אותו.';
+    $('#ganHint').textContent = okHint();
     if (selectId) f.gan.value = selectId;
   }
   f.city.addEventListener('change', function () { loadGans(); });
+  // מדריכות guide several gans: each one picks one of them, and the game goes there.
+  function okHint() {
+    return f.role.value === 'מדריכה'
+      ? 'מדריכה? בחרי אחד מהגנים שאת מדריכה בהם, והמשחק יגיע לגן הזה.'
+      : 'לא רואה את הגן שלך? כנראה שהגננת עוד לא פתחה אותו.';
+  }
+  f.role.addEventListener('change', function () { if (!f.gan.disabled) $('#ganHint').textContent = okHint(); });
 
   if (teacher) {
     show('#teacherBanner', true);
