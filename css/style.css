@@ -188,3 +188,6 @@ h2 { font-size: 24px; margin: 6px 0 10px; font-weight: 800; }
 @media (min-width: 900px) {
   .grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
 }
+.newgan { border-top: 2px dashed var(--line); margin: 4px 0 14px; padding-top: 12px; }
+.newgan h2 { margin-top: 0; }
+.newgan > small { display: block; font-size: 14px; line-height: 1.5; margin: -6px 0 12px; }

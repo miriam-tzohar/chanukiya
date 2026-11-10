@@ -1,43 +1,14 @@
-// Gannenet page: open the gan (no hash) or manage it (gan.html#g=<ganId>&k=<key>).
+// Gannenet admin page (gan.html#g=<ganId>&k=<key>). The gan itself is opened on the main page; no hash -> back there.
 (function () {
   var $ = UI.$, show = UI.show;
   var base = location.href.split('#')[0].replace(/gan\.html(\?.*)?$/, '');
-  var staffUrl = base + 'index.html';
+  var staffUrl = base;
 
-  function section(id) { ['s-open', 's-saved', 's-admin', 's-bad'].forEach(function (s) { show('#' + s, s === id); }); window.scrollTo(0, 0); }
-  function adminUrl(g, k) { return base + 'gan.html#g=' + encodeURIComponent(g) + '&k=' + encodeURIComponent(k); }
+  function section(id) { ['s-admin', 's-bad'].forEach(function (s) { show('#' + s, s === id); }); window.scrollTo(0, 0); }
   function staffMsg(name) {
     return 'צוות ' + name + ' יקר 🕎 צהר הלב מזמינה לכל אחת מאיתנו משחק חדש לגן, עד 70 ש"ח! ' +
-      'היכנסי, בחרי את הגן שלנו ובחרי משחק אחד (' + window.CONFIG.DEADLINE_TEXT + '): ' + staffUrl;
+      'היכנסי, בחרי את העיר ואת הגן שלנו, ובחרי משחק אחד (' + window.CONFIG.DEADLINE_TEXT + '): ' + staffUrl;
   }
-
-  var f = $('#openForm');
-  f.city.innerHTML = '<option value="">בחרי עיר</option>' + Logic.CITIES.map(function (c) { return '<option>' + UI.esc(c) + '</option>'; }).join('');
-  $('#openChan').innerHTML = UI.chanukiah(0, { shamash: true, label: 'חנוכייה שרק השמש שלה דולק' });
-
-  f.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    $('#openErr').textContent = '';
-    var p = { name: f.name.value, city: f.city.value, address: f.address.value, teacher: f.teacher.value,
-              phone: f.phone.value, staff: f.staff.value };
-    $('#openBtn').disabled = true;
-    var r = await API.call('registerGan', p);
-    $('#openBtn').disabled = false;
-    if (!r.ok) { $('#openErr').textContent = r.msg; return; }
-    var link = adminUrl(r.ganId, r.key);
-    try { localStorage.setItem('gift-admin', link); } catch (x) { }
-    $('#adminLink').value = link;
-    $('#mailAdmin').href = 'mailto:?subject=' + encodeURIComponent('קישור הניהול של ' + r.name + ' - החנוכייה של הגן') +
-      '&body=' + encodeURIComponent('קישור הניהול שלי (לא להעביר לצוות):\n' + link + '\n\nהקישור לצוות:\n' + staffUrl);
-    $('#waAdmin').href = 'https://wa.me/?text=' + encodeURIComponent('קישור הניהול של ' + r.name + ' (רק שלי): ' + link);
-    $('#staffMsg').value = staffMsg(r.name);
-    $('#toAdmin').href = link;
-    section('s-saved');
-    UI.confetti();
-  });
-  $('#copyAdmin').addEventListener('click', function (e) { UI.copyText($('#adminLink').value, e.target); });
-  $('#copyStaff').addEventListener('click', function (e) { UI.copyText($('#staffMsg').value, e.target); });
-  $('#toAdmin').addEventListener('click', function () { setTimeout(route, 0); });
 
   var A = null;
   async function loadAdmin(g, k) {
@@ -58,7 +29,7 @@
     }).join('');
     $('#aRows').innerHTML = rows;
     show('#aEmpty', !r.choices.length);
-    $('#onBehalf').href = 'index.html#g=' + encodeURIComponent(g) + '&k=' + encodeURIComponent(k);
+    $('#onBehalf').href = 'index.html' + (API.MOCK ? location.search : '') + '#g=' + encodeURIComponent(g) + '&k=' + encodeURIComponent(k);
     show('#onBehalf', !r.closed);
     $('#closeTitle').textContent = r.closed ? 'הסל סגור' : 'סגירת הסל';
     $('#closeText').textContent = r.closed ? 'צריך לתקן משהו? אפשר לפתוח את הסל מחדש עד שמרים מזמינה.' :
@@ -93,7 +64,7 @@
   function route() {
     var h = new URLSearchParams(location.hash.slice(1));
     if (h.get('g') && h.get('k')) loadAdmin(h.get('g'), h.get('k'));
-    else section('s-open');
+    else location.replace(staffUrl + (API.MOCK ? location.search : ''));
   }
   window.addEventListener('hashchange', route);
   route();

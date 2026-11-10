@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>פתיחת הגן לגננת | החנוכייה של הגן</title>
+<title>ניהול הגן לגננת | החנוכייה של הגן</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="img/logo.png">
 <link rel="stylesheet" href="css/style.css">
@@ -12,48 +12,7 @@
 <main class="wrap">
   <header class="top"><img src="img/logo.png" alt="צהר הלב"><div class="brand">צהר הלב<span>מרחב דרום</span></div></header>
 
-  <!-- 1. open a gan -->
-  <section id="s-open">
-    <h1>את <span class="hl">השמש</span> של הגן</h1>
-    <p class="lead">הגננת פותחת את הגן, ואז כל אשת צוות נכנסת, בוחרת משחק אחד עד 70 ש"ח ומדליקה נר בחנוכייה של הגן.</p>
-    <div id="openChan" aria-hidden="true"></div>
-    <form class="card" id="openForm" novalidate>
-      <h2>פתיחת הגן</h2>
-      <label class="field"><span>שם הגן</span><input name="name" required maxlength="60" placeholder="למשל: גן שושנים"></label>
-      <label class="field"><span>עיר</span><select name="city" required></select></label>
-      <label class="field"><span>כתובת הגן למשלוח המשחקים</span><input name="address" required maxlength="120" autocomplete="street-address" placeholder="רחוב, מספר, עיר"></label>
-      <div class="row2">
-        <label class="field"><span>שם הגננת</span><input name="teacher" required maxlength="60"></label>
-        <label class="field"><span>טלפון לתיאום משלוח</span><input name="phone" required inputmode="tel" maxlength="20" dir="ltr" style="text-align:right"></label>
-      </div>
-      <label class="field"><span>כמה אנשי צוות בגן?</span><input name="staff" required type="number" min="1" max="20" inputmode="numeric" value="7">
-        <small>כולל אותך, הסייעות וכל המטפלות הקבועות. כל אחת בוחרת משחק אחד, ולפי המספר הזה החנוכייה מתמלאת.</small></label>
-      <div class="msg err" id="openErr" role="alert"></div>
-      <button class="btn block" type="submit" id="openBtn">פתיחת הגן</button>
-    </form>
-  </section>
-
-  <!-- 2. opened: save the admin link -->
-  <section id="s-saved" class="hidden">
-    <h1>הגן <span class="hl">נפתח!</span></h1>
-    <div class="card">
-      <h2>1. שמרי את קישור הניהול שלך</h2>
-      <p>בקישור הזה תראי מי כבר בחרה, תוכלי לבחור בשם עובדת בלי סמארטפון, ולסגור את הסל בסוף. <b>הוא רק שלך, אל תעבירי אותו לצוות.</b></p>
-      <div class="copybox"><input id="adminLink" readonly aria-label="קישור הניהול"><button class="btn small navy" id="copyAdmin" type="button">העתקה</button></div>
-      <div class="actions">
-        <a class="btn ghost small" id="mailAdmin">שליחה לעצמי במייל</a>
-        <a class="btn ghost small" id="waAdmin" target="_blank" rel="noopener">שליחה לעצמי בוואטסאפ</a>
-      </div>
-    </div>
-    <div class="card">
-      <h2>2. ספרי לצוות</h2>
-      <p>כל העובדות נכנסות לאותו קישור, בוחרות עיר ואת הגן שלך. הנה הודעה מוכנה:</p>
-      <div class="copybox"><input id="staffMsg" readonly aria-label="הודעה לצוות"><button class="btn small navy" id="copyStaff" type="button">העתקה</button></div>
-    </div>
-    <a class="btn block teal" id="toAdmin">למסך הניהול של הגן</a>
-  </section>
-
-  <!-- 3. admin dashboard -->
+  <!-- the gannenet opens her gan on the main page (index.html); this page is only her private admin view -->
   <section id="s-admin" class="hidden">
     <h1 id="aTitle"></h1>
     <p class="center muted" id="aSub"></p>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>החנוכייה של הגן | צהר הלב</title>
-<meta name="description" content="כל אשת צוות בצהר הלב בוחרת משחק אחד לגן שלה, עד 70 ש&quot;ח.">
+<meta name="description" content="כל אשת צוות בגן בוחרת משחק אחד לגן שלה, עד 70 ש&quot;ח.">
 <meta property="og:title" content="החנוכייה של הגן | צהר הלב מרחב דרום">
 <meta property="og:description" content="כל אשת צוות בוחרת משחק אחד לגן שלה. צהר הלב מזמינה, ואתן מדליקות את החנוכייה.">
 <link rel="icon" href="img/logo.png">
@@ -22,8 +22,8 @@
     <button class="btn block" id="start" type="button">בואי נבחר משחק</button>
     <ol class="card small" style="padding-inline-start:36px">
       <li>נכנסים עם השם ו-4 ספרות אחרונות של תעודת הזהות</li>
-      <li>בוחרים עיר ואת הגן שלך (הגננת פותחת אותו קודם)</li>
-      <li>בוחרים משחק אחד מהקטלוג, ומדליקים נר בחנוכייה של הגן</li>
+      <li>הגננת פותחת את הגן עם הכתובת, וכל הצוות בוחרות אותו מהרשימה</li>
+      <li>כל אחת בוחרת משחק אחד מהקטלוג, ומדליקה נר בחנוכייה של הגן</li>
     </ol>
   </section>
 
@@ -37,12 +37,22 @@
       </div>
       <label class="field"><span>4 ספרות אחרונות של תעודת הזהות</span>
         <input name="id4" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="off" required dir="ltr" style="text-align:right">
-        <small>רק כדי לוודא שכל אחת בוחרת פעם אחת. לפני ההזמנה כל הבחירות נבדקות מול רשימת הצוות של צהר הלב. לא מבקשים את המספר המלא.</small></label>
+        <small>רק כדי לוודא שכל אחת בוחרת פעם אחת. לא מבקשים את המספר המלא.</small></label>
       <label class="field"><span>תפקיד</span><select name="role" required></select></label>
       <div id="ganPick">
         <label class="field"><span>עיר</span><select name="city" required></select></label>
         <label class="field"><span>הגן שלך</span><select name="gan" required disabled><option value="">קודם בוחרים עיר</option></select>
           <small id="ganHint"></small></label>
+        <div id="newGan" class="newgan hidden">
+          <h2>פתיחת הגן</h2>
+          <label class="field"><span>שם הגן</span><input name="gname" maxlength="60" placeholder="למשל: גן שושנים"></label>
+          <label class="field"><span>כתובת הגן למשלוח המשחקים</span><input name="address" maxlength="120" autocomplete="street-address" placeholder="רחוב, מספר, עיר"></label>
+          <div class="row2">
+            <label class="field"><span>טלפון לתיאום משלוח</span><input name="phone" inputmode="tel" maxlength="20" dir="ltr" style="text-align:right"></label>
+            <label class="field"><span>כמה אנשי צוות בגן?</span><input name="staff" type="number" min="1" max="20" inputmode="numeric" value="7"></label>
+          </div>
+          <small class="muted">כולל אותך, הסייעות, המטפלות והמדריכה. לפי המספר הזה החנוכייה של הגן מתמלאת.</small>
+        </div>
       </div>
       <div class="msg err" id="idErr" role="alert"></div>
       <button class="btn block" type="submit" id="idSubmit">לקטלוג המשחקים</button>
@@ -75,6 +85,18 @@
         <button class="btn ghost small" id="changeBtn" type="button">החלפת משחק</button>
         <a class="btn ghost small" href="wall.html">לקיר החנוכיות</a>
         <a class="btn ghost small hidden" id="adminBack">חזרה לניהול הגן</a>
+      </div>
+    </div>
+    <div class="card hidden" id="ganCard" style="text-align:right">
+      <h2>את השמש של <span id="gcName"></span></h2>
+      <p>הגן פתוח! עכשיו שלחי לצוות את אותו הקישור. כל אחת נכנסת, בוחרת את העיר ואת הגן, ובוחרת משחק.</p>
+      <div class="copybox"><input id="staffMsg" readonly aria-label="הודעה לצוות"><button class="btn small navy" id="copyStaff" type="button">העתקה</button></div>
+      <div class="actions"><a class="btn teal small" id="waStaff" target="_blank" rel="noopener">שליחה לצוות בוואטסאפ</a></div>
+      <p class="small" style="margin-top:16px"><b>קישור הניהול שלך:</b> בו רואים מי כבר בחרה ומה, אפשר לבחור בשם עובדת בלי סמארטפון, ולסגור את הסל בסוף. הוא רק שלך, אל תעבירי אותו לצוות.</p>
+      <div class="actions">
+        <a class="btn ghost small" id="toAdmin">למסך הניהול</a>
+        <a class="btn ghost small" id="mailAdmin">שליחה לעצמי במייל</a>
+        <button class="btn ghost small" id="copyAdmin" type="button">העתקת הקישור</button>
       </div>
     </div>
   </section>

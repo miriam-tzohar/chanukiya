@@ -1,10 +1,11 @@
-// Staff page: identify -> pick gan -> pick one game -> light a candle.
+// The one link for everyone: identify -> pick gan (the gannenet opens it here first) -> pick one game -> light a candle.
 // Teacher mode: index.html#g=<ganId>&k=<key> lets the gannenet choose on behalf of a staff member.
 (function () {
   var $ = UI.$, show = UI.show, C = window.CONFIG;
   var hash = new URLSearchParams(location.hash.slice(1));
   var teacher = hash.get('g') && hash.get('k') ? { ganId: hash.get('g'), key: hash.get('k') } : null;
   var S = { me: null, gan: null, status: null, catalog: null, cat: null, gans: null, pick: null, myItem: '' };
+  var SITE = location.href.split('#')[0].split('?')[0].replace(/index\.html$/, '');
 
   function section(id) {
     ['s-hero', 's-id', 's-cat', 's-done'].forEach(function (s) { show('#' + s, s === id); });
@@ -32,44 +33,70 @@
     if (saved.city) f.city.value = saved.city;
   }
 
+  // One link for everyone: the gannenet opens her gan from this same form (gan list option NEW), the staff pick it.
+  var NEW = '__new';
+  function isGannenet() { return f.role.value === 'גננת'; }
+
   async function loadGans(selectId) {
     var city = f.city.value;
     f.gan.disabled = true;
     $('#ganHint').textContent = '';
-    if (!city) { f.gan.innerHTML = '<option value="">קודם בוחרים עיר</option>'; return; }
+    if (!city) { f.gan.innerHTML = '<option value="">קודם בוחרים עיר</option>'; toggleNew(); return; }
     f.gan.innerHTML = '<option value="">טוען גנים...</option>';
     if (!S.gans) {
       var r = await API.call('listGans', {});
       if (!r.ok) { $('#ganHint').textContent = r.msg; return; }
       S.gans = r.gans;
     }
-    var list = S.gans.filter(function (g) { return g.city === city; });
-    if (!list.length) {
+    renderGans(selectId);
+  }
+
+  function renderGans(selectId) {
+    var city = f.city.value, prev = selectId === undefined ? f.gan.value : selectId;
+    var list = (S.gans || []).filter(function (g) { return g.city === city; });
+    var canOpen = isGannenet();
+    if (!list.length && !canOpen) {
       f.gan.innerHTML = '<option value="">אין עדיין גנים פתוחים בעיר הזו</option>';
-      $('#ganHint').textContent = 'הגננת שלך עוד לא פתחה את הגן. נסי שוב מחר, או בקשי מהגננת לפתוח אותו.';
-      return;
+      f.gan.disabled = true;
+    } else {
+      f.gan.innerHTML = '<option value="">בחרי את הגן שלך</option>' + list.map(function (g) {
+        return '<option value="' + UI.esc(g.id) + '"' + (g.closed ? ' disabled' : '') + '>' + UI.esc(g.name) + (g.closed ? ' (הסל נסגר)' : '') + '</option>';
+      }).join('') + (canOpen ? '<option value="' + NEW + '">פתיחת גן חדש (אני הגננת)</option>' : '');
+      f.gan.disabled = false;
+      if (prev) f.gan.value = prev;
+      if (!f.gan.value && canOpen && !list.length) f.gan.value = NEW;
     }
-    f.gan.innerHTML = '<option value="">בחרי את הגן שלך</option>' + list.map(function (g) {
-      return '<option value="' + UI.esc(g.id) + '"' + (g.closed ? ' disabled' : '') + '>' + UI.esc(g.name) + (g.closed ? ' (הסל נסגר)' : '') + '</option>';
-    }).join('');
-    f.gan.disabled = false;
-    $('#ganHint').textContent = okHint();
-    if (selectId) f.gan.value = selectId;
+    toggleNew();
   }
-  f.city.addEventListener('change', function () { loadGans(); });
-  // מדריכות guide several gans: each one picks one of them, and the game goes there.
-  function okHint() {
-    return f.role.value === 'מדריכה'
-      ? 'מדריכה? בחרי אחד מהגנים שאת מדריכה בהם, והמשחק יגיע לגן הזה.'
-      : 'לא רואה את הגן שלך? כנראה שהגננת עוד לא פתחה אותו.';
+
+  function toggleNew() {
+    var opening = !f.gan.disabled && f.gan.value === NEW;
+    show('#newGan', opening);
+    $('#idSubmit').textContent = opening ? 'פתיחת הגן ובחירת משחק' : 'לקטלוג המשחקים';
+    $('#ganHint').textContent = f.city.value && S.gans ? okHint(opening) : '';
   }
-  f.role.addEventListener('change', function () { if (!f.gan.disabled) $('#ganHint').textContent = okHint(); });
+  function okHint(opening) {
+    var hasGans = (S.gans || []).some(function (g) { return g.city === f.city.value; });
+    if (opening) return 'מלאי את פרטי הגן. אחר כך תבחרי משחק, והצוות שלך יוכל לבחור את הגן מהרשימה.';
+    if (isGannenet()) return 'הגן שלך כבר ברשימה? בחרי אותו. אם לא, בחרי "פתיחת גן חדש".';
+    if (!hasGans) return 'הגננת שלך עוד לא פתחה את הגן. נסי שוב מחר, או בקשי מהגננת לפתוח אותו.';
+    // מדריכות guide several gans: each one picks one of them, and the game goes there.
+    if (f.role.value === 'מדריכה') return 'מדריכה? בחרי אחד מהגנים שאת מדריכה בהם, והמשחק יגיע לגן הזה.';
+    return 'לא רואה את הגן שלך? כנראה שהגננת עוד לא פתחה אותו.';
+  }
+  f.city.addEventListener('change', function () { loadGans(''); });
+  f.gan.addEventListener('change', toggleNew);
+  f.role.addEventListener('change', function () { if (S.gans && f.city.value) renderGans(); else toggleNew(); });
+
+  // The gannenet's private admin links, per gan, kept on her device.
+  function adminLinks() { var m = store('gift-admin'); return m && typeof m === 'object' ? m : {}; }
+  function adminUrl(g, k) { return SITE + 'gan.html' + (API.MOCK ? location.search : '') + '#g=' + encodeURIComponent(g) + '&k=' + encodeURIComponent(k); }
 
   if (teacher) {
     show('#teacherBanner', true);
     show('#ganPick', false);
     $('#idTitle').textContent = 'פרטי העובדת שבשמה את בוחרת';
-    $('#adminBack').href = 'gan.html#g=' + encodeURIComponent(teacher.ganId) + '&k=' + encodeURIComponent(teacher.key);
+    $('#adminBack').href = adminUrl(teacher.ganId, teacher.key);
     show('#adminBack', true);
   }
 
@@ -93,12 +120,33 @@
     if (!/^\d{4}$/.test(me.id4)) return setErr('#idErr', 'צריך בדיוק 4 ספרות אחרונות של תעודת הזהות');
     if (!me.role) return setErr('#idErr', 'בחרי תפקיד');
     if (!ganId) return setErr('#idErr', 'בחרי עיר ואת הגן שלך');
+    var opening = !teacher && ganId === NEW, ng = null;
+    if (opening) {
+      ng = { name: f.gname.value.trim(), city: f.city.value, address: f.address.value.trim(), phone: f.phone.value.trim(),
+             staff: f.staff.value, teacher: me.first + ' ' + me.last };
+      if (Logic.norm(ng.name).length < 2) return setErr('#idErr', 'חסר שם הגן');
+      if (ng.address.length < 4) return setErr('#idErr', 'חסרה כתובת הגן למשלוח המשחקים');
+      if (ng.phone.replace(/\D/g, '').length < 9) return setErr('#idErr', 'חסר טלפון לתיאום משלוח');
+    }
     $('#idSubmit').disabled = true;
     try {
       var mine = await API.call('myChoice', me);
       if (!mine.ok) return setErr('#idErr', mine.msg);
       if (mine.found && mine.ganId !== ganId) {
         return setErr('#idErr', 'כבר בחרת משחק ' + UI.toGan(mine.ganName) + ' (' + mine.itemName + '). כל אחת בוחרת פעם אחת.');
+      }
+      if (opening) {
+        var reg = await API.call('registerGan', ng);
+        if (!reg.ok) {
+          if (reg.code === 'dup') {
+            S.gans = null; await loadGans('');
+            return setErr('#idErr', 'הגן "' + ng.name.replace(/\s+/g, ' ') + '" ב' + ng.city + ' כבר פתוח. בחרי אותו מהרשימה למעלה.');
+          }
+          return setErr('#idErr', reg.msg);
+        }
+        ganId = reg.ganId;
+        var links = adminLinks(); links[ganId] = adminUrl(ganId, reg.key); store('gift-admin', links);
+        S.gans = null; await loadGans(ganId);   // from now on the form points at the opened gan
       }
       var st = await API.call('ganStatus', { ganId: ganId });
       if (!st.ok) return setErr('#idErr', st.msg);
@@ -183,12 +231,26 @@
       ? 'הגננת כבר סגרה את הסל. מרים מזמינה את כל המשחקים, והם יגיעו לגן לפני חנוכה.'
       : 'אפשר להחליף משחק עד שהגננת סוגרת את הסל. מרים מזמינה את כל המשחקים, והם יגיעו לגן לפני חנוכה.';
     show('#changeBtn', !closed);
-    var site = location.href.split('#')[0].split('?')[0];
     $('#waBtn').href = 'https://wa.me/?text=' + encodeURIComponent('בחרתי את "' + gameName + '" ' + UI.toGan(st.name) +
-      ' במתנת החנוכה של צהר הלב 🕎\nגם את בצוות? היכנסי ובחרי משחק לגן שלך: ' + site);
+      ' במתנת החנוכה של צהר הלב 🕎\nגם את בצוות? היכנסי ובחרי משחק לגן שלך: ' + SITE);
+    var admin = teacher ? '' : adminLinks()[st.id];
+    show('#ganCard', !!admin);
+    if (admin) {
+      var msg = 'צוות ' + st.name + ' יקר 🕎 צהר הלב מזמינה לכל אחת מאיתנו משחק חדש לגן, עד 70 ש"ח! ' +
+        'היכנסי, בחרי ' + st.city + ' ואת ' + st.name + ', ובחרי משחק אחד (' + C.DEADLINE_TEXT + '): ' + SITE;
+      $('#gcName').textContent = st.name;
+      $('#staffMsg').value = msg;
+      $('#waStaff').href = 'https://wa.me/?text=' + encodeURIComponent(msg);
+      $('#toAdmin').href = admin;
+      $('#mailAdmin').href = 'mailto:?subject=' + encodeURIComponent('קישור הניהול של ' + st.name + ' - החנוכייה של הגן') +
+        '&body=' + encodeURIComponent('קישור הניהול שלי (לא להעביר לצוות):\n' + admin + '\n\nהקישור לצוות:\n' + SITE);
+    }
     section('s-done');
     if (celebrate) UI.confetti();
   }
+
+  $('#copyStaff').addEventListener('click', function (e) { UI.copyText($('#staffMsg').value, e.target); });
+  $('#copyAdmin').addEventListener('click', function (e) { UI.copyText($('#toAdmin').href, e.target); });
 
   $('#changeBtn').addEventListener('click', function () {
     API.call('ganStatus', { ganId: S.status.id }).then(function (st) {
