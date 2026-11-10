@@ -170,7 +170,9 @@
   async function openCatalog(note) {
     S.catalog = S.catalog || await API.loadCatalog();
     drawBar();
-    $('#catNote').textContent = note || 'בחרי משחק אחד לגן, עד 70 ש"ח. משחק שכבר נבחר בגן שלך נעול, כדי שלא יהיו כפולים.';
+    $('#catNote').textContent = note || (teacher
+      ? 'בוחרת בשם עובדת מהקטלוג המודפס? כתבי את מספר המשחק בחיפוש.'
+      : 'בחרי משחק אחד לגן, עד 70 ש"ח. משחק שכבר נבחר בגן שלך נעול, כדי שלא יהיו כפולים.');
     setErr('#catErr', '');
     section('s-cat');
     if (!S.cat) S.cat = UI.mountCatalog($('#catalog'), S.catalog, { taken: S.status.taken, mine: S.myItem, onPick: ask });
@@ -241,6 +243,7 @@
       $('#gcName').textContent = st.name;
       $('#staffMsg').value = msg;
       $('#waStaff').href = 'https://wa.me/?text=' + encodeURIComponent(msg);
+      $('#mailStaff').href = 'mailto:?subject=' + encodeURIComponent('משחק חדש לגן מצהר הלב 🕎 ' + st.name) + '&body=' + encodeURIComponent(msg);
       $('#toAdmin').href = admin;
       $('#mailAdmin').href = 'mailto:?subject=' + encodeURIComponent('קישור הניהול של ' + st.name + ' - החנוכייה של הגן') +
         '&body=' + encodeURIComponent('קישור הניהול שלי (לא להעביר לצוות):\n' + admin + '\n\nהקישור לצוות:\n' + SITE);

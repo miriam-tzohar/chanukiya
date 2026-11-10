@@ -4,3 +4,5 @@
 *.csv
 *.pdf
 *.docx
+# The one exception: the public printed catalog (games and prices only, no names or IDs).
+!catalog.pdf

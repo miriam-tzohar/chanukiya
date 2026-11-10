@@ -31,6 +31,8 @@
     show('#aEmpty', !r.choices.length);
     $('#onBehalf').href = 'index.html' + (API.MOCK ? location.search : '') + '#g=' + encodeURIComponent(g) + '&k=' + encodeURIComponent(k);
     show('#onBehalf', !r.closed);
+    $('#waStaff2').href = 'https://wa.me/?text=' + encodeURIComponent(staffMsg(r.name));
+    $('#mailStaff2').href = 'mailto:?subject=' + encodeURIComponent('משחק חדש לגן מצהר הלב 🕎 ' + r.name) + '&body=' + encodeURIComponent(staffMsg(r.name));
     $('#closeTitle').textContent = r.closed ? 'הסל סגור' : 'סגירת הסל';
     $('#closeText').textContent = r.closed ? 'צריך לתקן משהו? אפשר לפתוח את הסל מחדש עד שמרים מזמינה.' :
       'כשכל הצוות בחר (או כשמגיע מועד הסגירה), סגרי את הסל. אחרי הסגירה אי אפשר להחליף, ומרים מזמינה את המשחקים.';

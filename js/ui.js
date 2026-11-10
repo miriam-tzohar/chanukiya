@@ -94,7 +94,7 @@ var UI = (function () {
         return '<button type="button" class="chip" data-d="' + esc(d) + '" aria-pressed="' + (d === 'הכל') + '">' + esc(d) +
           (d === 'הכל' ? ' (' + catalog.items.length + ')' : ' (' + (counts[d] || 0) + ')') + '</button>';
       }).join('') + '</div>' +
-      '<input class="search" type="search" placeholder="חיפוש משחק לפי שם" aria-label="חיפוש משחק">' +
+      '<input class="search" type="search" placeholder="חיפוש משחק לפי שם או מספר" aria-label="חיפוש משחק">' +
       '<div class="grid"></div><div class="empty hidden">לא נמצאו משחקים</div>';
     var grid = $('.grid', root), empty = $('.empty', root);
     root.querySelectorAll('.chip').forEach(function (b) {
@@ -115,6 +115,7 @@ var UI = (function () {
         (mine ? 'הבחירה שלך ✓' : taken ? 'כבר נבחר בגן שלך' : 'זה המשחק שלי') + '</button>';
       return '<article class="game' + (taken ? ' taken' : '') + (mine ? ' mine' : '') + '">' +
         (mine ? '<span class="tag">הבחירה שלך</span>' : taken ? '<span class="tag">נבחר</span>' : '') +
+        (it.no ? '<span class="no">' + it.no + '</span>' : '') +
         '<div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="' + esc(it.t) + '" alt=""></div>' +
         '<div class="b"><div class="n">' + esc(it.n) + '</div>' +
         '<div class="meta"><span class="price">' + money(it.p) + '</span><span class="sup">' + esc(sup) + '</span></div>' +
@@ -123,7 +124,9 @@ var UI = (function () {
     }
     function draw() {
       var list = catalog.items.filter(function (i) {
-        return (state.dom === 'הכל' || i.d === state.dom) && (!state.q || Logic.norm(i.n).indexOf(state.q) >= 0);
+        var byNo = /^\d+$/.test(state.q);   // a number from the printed catalog
+        return (byNo || state.dom === 'הכל' || i.d === state.dom) &&
+          (!state.q || (byNo ? String(i.no) === state.q : Logic.norm(i.n).indexOf(state.q) >= 0));
       });
       grid.innerHTML = list.map(card).join('');
       show(empty, list.length === 0);
