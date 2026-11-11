@@ -8,6 +8,7 @@
  */
 var Logic = (function () {
   var MAX_PRICE = 70;
+  var GUIDE_ROLE = 'מדריכה';   // 11.11: מדריכות help their staff choose, they do not choose a game
   var CITIES = ['באר שבע', 'דימונה', 'נתיבות', 'אופקים', 'ערד', 'ירוחם', 'אחר'];
 
   function norm(s) {
@@ -43,7 +44,7 @@ var Logic = (function () {
     var staff = parseInt(p.staff, 10);
     if (name.length < 2) return err('name', 'חסר שם הגן');
     if (!city) return err('city', 'חסרה עיר');
-    if (teacher.length < 2) return err('teacher', 'חסר שם הגננת');
+    if (teacher.length < 2) return err('teacher', 'חסר שם הרכזת');
     if (address.length < 4) return err('address', 'חסרה כתובת למשלוח');
     if (phone.replace(/\D/g, '').length < 9) return err('phone', 'חסר טלפון לתיאום משלוח');
     if (!(staff >= 1 && staff <= 20)) return err('staff', 'מספר אנשי הצוות צריך להיות בין 1 ל-20');
@@ -106,13 +107,14 @@ var Logic = (function () {
     if (!g) return err('nogan', 'הגן לא נמצא');
     var byTeacher = !!p.key;
     if (byTeacher && g.key !== p.key) return err('key', 'קישור הניהול לא תקין');
-    if (g.closed) return err('ganclosed', 'הגננת כבר סגרה את הסל של הגן');
+    if (g.closed) return err('ganclosed', 'הרכזת כבר סגרה את הסל של הגן');
     var first = clip(p.first, 40), last = clip(p.last, 40), id4 = String(p.id4 || '').trim();
     var role = clip(p.role, 40);
     if (norm(first).length < 2) return err('first', 'חסר שם פרטי');
     if (norm(last).length < 2) return err('last', 'חסר שם משפחה');
     if (!/^\d{4}$/.test(id4)) return err('id4', 'צריך 4 ספרות אחרונות של תעודת הזהות');
     if (!role) return err('role', 'חסר תפקיד');
+    if (norm(role) === norm(GUIDE_ROLE)) return err('guide', 'מדריכות לא בוחרות משחק. עזרי למודרכות שלך לבחור.');
     if (!item || !item.id) return err('item', 'המשחק לא נמצא בקטלוג');
     if (!(item.p > 0 && item.p <= MAX_PRICE)) return err('price', 'המחיר מעל ' + MAX_PRICE + ' ש"ח');
 
@@ -139,7 +141,7 @@ var Logic = (function () {
     if (mine) ops.push({ t: 'setChoice', id: mine.id, fields: { status: 'הוחלף' } });
     var row = { id: code(rand, 8), ts: now, ganId: g.id, ganName: g.name, city: g.city, first: first, last: last,
       id4: id4, role: role, itemId: item.id, itemName: item.n, supplier: item.s, price: item.p, url: item.u || '',
-      by: byTeacher ? 'גננת' : 'עובדת', status: 'פעיל' };
+      by: byTeacher ? 'רכזת' : 'עובדת', status: 'פעיל' };
     ops.push({ t: 'addChoice', row: row });
     var chosen = active(db, g.id).length + (mine ? 0 : 1);
     return { res: { ok: true, replaced: !!mine, choiceId: row.id, chosen: chosen, staff: g.staff, ganName: g.name }, ops: ops };

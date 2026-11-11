@@ -28,13 +28,19 @@
     <button class="btn block" id="start" type="button">בואי נבחר משחק</button>
     <ol class="card small" style="padding-inline-start:36px">
       <li>נכנסים עם השם ו-4 ספרות אחרונות של תעודת הזהות</li>
-      <li>הגננת פותחת את הגן עם הכתובת, וכל הצוות בוחרות אותו מהרשימה</li>
+      <li>העו״סית רכזת הגן פותחת את הגן עם הכתובת, וכל הצוות בוחרות אותו מהרשימה</li>
       <li>כל אחת בוחרת משחק אחד מהקטלוג, ומדליקה נר בחנוכייה של הגן</li>
+      <li>המדריכות לא בוחרות משחק בעצמן. הן עוזרות למודרכות שלהן לבחור</li>
     </ol>
+    <div class="card hidden" id="myGans">
+      <h2>הגנים שפתחת</h2>
+      <p class="small muted">קישורי הניהול שלך, שמורים במכשיר הזה. בהם רואים מי בחרה, בוחרים בשם עובדת וסוגרים את הסל.</p>
+      <div class="actions" id="myGansList"></div>
+    </div>
   </section>
 
   <section id="s-id" class="hidden">
-    <div class="msg info hidden" id="teacherBanner">מצב גננת: את בוחרת בשם עובדת מהצוות של הגן</div>
+    <div class="msg info hidden" id="teacherBanner">מצב רכזת: את בוחרת בשם עובדת מהצוות של הגן</div>
     <form class="card" id="idForm" novalidate>
       <h2 id="idTitle">קודם כל, מי את?</h2>
       <div class="row2">
@@ -45,19 +51,29 @@
         <input name="id4" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="off" required dir="ltr" style="text-align:right">
         <small>רק כדי לוודא שכל אחת בוחרת פעם אחת. לא מבקשים את המספר המלא.</small></label>
       <label class="field"><span>תפקיד</span><select name="role" required></select></label>
+      <div class="msg info hidden" id="guideNote">
+        <b>מדריכה יקרה, את לא צריכה לבחור משחק.</b><br>
+        התפקיד שלך הוא לעזור למודרכות שלך לבחור. שבי איתן מול הקטלוג, המליצי על משחק שמתאים לילדים בגן,
+        וכל אחת מהן נכנסת לקישור ובוחרת בעצמה.
+        <div class="actions" style="margin-top:10px">
+          <a class="btn small navy" href="catalog.pdf" target="_blank" rel="noopener">לקטלוג המשחקים</a>
+          <a class="btn small ghost" href="wall.html">לקיר החנוכיות</a>
+        </div>
+      </div>
       <div id="ganPick">
         <label class="field"><span>עיר</span><select name="city" required></select></label>
         <label class="field"><span>הגן שלך</span><select name="gan" required disabled><option value="">קודם בוחרים עיר</option></select>
           <small id="ganHint"></small></label>
         <div id="newGan" class="newgan hidden">
           <h2>פתיחת הגן</h2>
+          <p class="small muted">את רכזת הגן, ולכן את פותחת אותו. רכזת של כמה גנים? פותחים כל גן בנפרד.</p>
           <label class="field"><span>שם הגן</span><input name="gname" maxlength="60" placeholder="למשל: גן שושנים"></label>
           <label class="field"><span>כתובת הגן למשלוח המשחקים</span><input name="address" maxlength="120" autocomplete="street-address" placeholder="רחוב, מספר, עיר"></label>
           <div class="row2">
             <label class="field"><span>טלפון לתיאום משלוח</span><input name="phone" inputmode="tel" maxlength="20" dir="ltr" style="text-align:right"></label>
-            <label class="field"><span>כמה אנשי צוות בגן?</span><input name="staff" type="number" min="1" max="20" inputmode="numeric" value="7"></label>
+            <label class="field"><span>כמה יבחרו משחק לגן?</span><input name="staff" type="number" min="1" max="20" inputmode="numeric" value="6"></label>
           </div>
-          <small class="muted">כולל אותך, הסייעות, המטפלות והמדריכה. לפי המספר הזה החנוכייה של הגן מתמלאת.</small>
+          <small class="muted">הגננת, הסייעות והמטפלות של הגן, ואת אם תבחרי משחק לגן הזה. המדריכה לא נספרת, כי היא לא בוחרת. לפי המספר הזה החנוכייה של הגן מתמלאת.</small>
         </div>
       </div>
       <div class="msg err" id="idErr" role="alert"></div>
@@ -76,13 +92,23 @@
     <div id="catalog"></div>
   </section>
 
+  <section id="s-open" class="hidden center">
+    <h1>הגן <span class="hl">נפתח!</span></h1>
+    <div id="openChan"></div>
+    <p class="progress-line"><b id="openGan"></b> מופיע עכשיו ברשימת הגנים, והשמש שלו דולק.</p>
+    <div class="actions" style="justify-content:center">
+      <button class="btn teal" id="openPick" type="button">לבחירת המשחק שלי לגן הזה</button>
+      <button class="btn ghost" id="openMore" type="button">פתיחת גן נוסף</button>
+    </div>
+  </section>
+
   <section id="s-done" class="hidden center">
     <h1>הדלקת <span class="hl">נר!</span></h1>
     <div id="doneChan"></div>
     <p class="progress-line" id="doneProg"></p>
     <div class="card">
       <p>בחרת את <b id="doneGame"></b> <b id="doneGan"></b>.</p>
-      <p class="small muted" id="doneNote">אפשר להחליף משחק עד שהגננת סוגרת את הסל. מרים מזמינה את כל המשחקים, והם יגיעו לגן לפני חנוכה.</p>
+      <p class="small muted" id="doneNote">אפשר להחליף משחק עד שהרכזת סוגרת את הסל. מרים מזמינה את כל המשחקים, והם יגיעו לגן לפני חנוכה.</p>
       <div class="actions" style="justify-content:center">
         <button class="btn teal" id="shareBtn" type="button">תמונה לסטטוס</button>
         <a class="btn ghost" id="waBtn" target="_blank" rel="noopener">שליחה בוואטסאפ</a>
@@ -93,23 +119,24 @@
         <a class="btn ghost small hidden" id="adminBack">חזרה לניהול הגן</a>
       </div>
     </div>
-    <div class="card hidden" id="ganCard" style="text-align:right">
-      <h2>את השמש של <span id="gcName"></span></h2>
-      <p>הגן פתוח! עכשיו שלחי לצוות את אותו הקישור. כל אחת נכנסת, בוחרת את העיר ואת הגן, ובוחרת משחק.</p>
-      <div class="copybox"><input id="staffMsg" readonly aria-label="הודעה לצוות"><button class="btn small navy" id="copyStaff" type="button">העתקה</button></div>
-      <div class="actions">
-        <a class="btn teal small" id="waStaff" target="_blank" rel="noopener">שליחה לצוות בוואטסאפ</a>
-        <a class="btn navy small" id="mailStaff">שליחה לצוות במייל</a>
-      </div>
-      <p class="small muted">עובדת בלי אינטרנט, או שהאתר חסום אצלה? שלחי לה את <a href="catalog.pdf" target="_blank" rel="noopener">הקטלוג להדפסה</a>. היא בוחרת מספר משחק, ואת בוחרת בשמה במסך הניהול.</p>
-      <p class="small" style="margin-top:16px"><b>קישור הניהול שלך:</b> בו רואים מי כבר בחרה ומה, אפשר לבחור בשם עובדת בלי סמארטפון, ולסגור את הסל בסוף. הוא רק שלך, אל תעבירי אותו לצוות.</p>
-      <div class="actions">
-        <a class="btn ghost small" id="toAdmin">למסך הניהול</a>
-        <a class="btn ghost small" id="mailAdmin">שליחה לעצמי במייל</a>
-        <button class="btn ghost small" id="copyAdmin" type="button">העתקת הקישור</button>
-      </div>
-    </div>
   </section>
+
+  <div class="card hidden" id="ganCard" style="text-align:right">
+    <h2>את השמש של <span id="gcName"></span></h2>
+    <p>שלחי לצוות של הגן את אותו הקישור. כל אחת נכנסת, בוחרת את העיר ואת הגן, ובוחרת משחק. המדריכה עוזרת להן לבחור.</p>
+    <div class="copybox"><input id="staffMsg" readonly aria-label="הודעה לצוות"><button class="btn small navy" id="copyStaff" type="button">העתקה</button></div>
+    <div class="actions">
+      <a class="btn teal small" id="waStaff" target="_blank" rel="noopener">שליחה לצוות בוואטסאפ</a>
+      <a class="btn navy small" id="mailStaff">שליחה לצוות במייל</a>
+    </div>
+    <p class="small muted">עובדת בלי אינטרנט, או שהאתר חסום אצלה? שלחי לה את <a href="catalog.pdf" target="_blank" rel="noopener">הקטלוג להדפסה</a>. היא אומרת לך מספר משחק, ואת בוחרת בשמה במסך הניהול.</p>
+    <p class="small" style="margin-top:16px"><b>קישור הניהול שלך:</b> בו רואים מי כבר בחרה ומה, אפשר לבחור בשם עובדת בלי סמארטפון, ולסגור את הסל בסוף. הוא רק שלך, אל תעבירי אותו לצוות.</p>
+    <div class="actions">
+      <a class="btn ghost small" id="toAdmin">למסך הניהול</a>
+      <a class="btn ghost small" id="mailAdmin">שליחה לעצמי במייל</a>
+      <button class="btn ghost small" id="copyAdmin" type="button">העתקת הקישור</button>
+    </div>
+    </div>
 
   <p class="foot">צהר הלב · מרחב דרום · חנוכה תשפ״ז<br>שאלות? מרים: 052-7609153 · miryamti@tzlev.com</p>
 </main>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ניהול הגן לגננת | החנוכייה של הגן</title>
+<title>ניהול הגן לרכזת | החנוכייה של הגן</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="img/logo.png">
 <link rel="stylesheet" href="css/style.css">
@@ -12,7 +12,7 @@
 <main class="wrap">
   <header class="top"><img src="img/logo.png" alt="צהר הלב"><div class="brand">צהר הלב<span>מרחב דרום</span></div></header>
 
-  <!-- the gannenet opens her gan on the main page (index.html); this page is only her private admin view -->
+  <!-- the עו״סית רכזת opens her gans on the main page (index.html); this page is only her private admin view -->
   <section id="s-admin" class="hidden">
     <h1 id="aTitle"></h1>
     <p class="center muted" id="aSub"></p>
@@ -24,6 +24,7 @@
       <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>שם</th><th>תפקיד</th><th>משחק</th><th>מחיר</th><th></th></tr></thead><tbody id="aRows"></tbody></table></div>
       <p class="small muted">עובדת בלי אינטרנט, או שהאתר חסום אצלה? שלחי לה את <a href="catalog.pdf" target="_blank" rel="noopener">הקטלוג להדפסה</a>. היא אומרת לך מספר משחק, ואת בוחרת בשמה ב"בחירה בשם עובדת" (אפשר לחפש לפי המספר).</p>
       <p class="empty hidden" id="aEmpty">עוד אף אחת לא בחרה. שלחי לצוות את הקישור.</p>
+      <p class="small muted">המדריכות לא בוחרות משחק בעצמן. הן עוזרות לצוות לבחור.</p>
       <div class="actions">
         <a class="btn teal small" id="onBehalf">בחירה בשם עובדת</a>
         <a class="btn ghost small" id="waStaff2" target="_blank" rel="noopener">הודעה לצוות בוואטסאפ</a>
@@ -38,6 +39,7 @@
       <div class="msg err" id="aErr" role="alert"></div>
       <button class="btn navy" id="closeBtn" type="button">סגירת הסל של הגן</button>
     </div>
+    <p class="center"><a class="btn ghost small" id="openAnother">רכזת של עוד גן? לפתיחת גן נוסף</a></p>
   </section>
 
   <section id="s-bad" class="hidden">

@@ -1,4 +1,4 @@
-// Gannenet admin page (gan.html#g=<ganId>&k=<key>). The gan itself is opened on the main page; no hash -> back there.
+// The רכזת admin page (gan.html#g=<ganId>&k=<key>). The gan itself is opened on the main page; no hash -> back there.
 (function () {
   var $ = UI.$, show = UI.show;
   var base = location.href.split('#')[0].replace(/gan\.html(\?.*)?$/, '');
@@ -6,8 +6,8 @@
 
   function section(id) { ['s-admin', 's-bad'].forEach(function (s) { show('#' + s, s === id); }); window.scrollTo(0, 0); }
   function staffMsg(name) {
-    return 'צוות ' + name + ' יקר 🕎 צהר הלב מזמינה לכל אחת מאיתנו משחק חדש לגן, עד 70 ש"ח! ' +
-      'היכנסי, בחרי את העיר ואת הגן שלנו, ובחרי משחק אחד (' + window.CONFIG.DEADLINE_TEXT + '): ' + staffUrl;
+    return 'צוות ' + name + ' יקר 🕎 צהר הלב מזמינה לכל אחת מכן משחק חדש לגן, עד 70 ש"ח! ' +
+      'היכנסי, בחרי את העיר ואת הגן, ובחרי משחק אחד (' + window.CONFIG.DEADLINE_TEXT + '). המדריכה שלך תשמח לעזור בבחירה: ' + staffUrl;
   }
 
   var A = null;
@@ -23,7 +23,7 @@
     $('#aState').textContent = r.closed ? 'הסל סגור. מרים מקבלת את הרשימה ומזמינה.' :
       'הסל פתוח. העובדות נכנסות בקישור הכללי ובוחרות את ' + r.name + '.';
     var rows = r.choices.map(function (c) {
-      return '<tr><td>' + UI.esc(c.first + ' ' + c.last) + (c.by === 'גננת' ? ' <span class="small muted">(בחרת בשמה)</span>' : '') + '</td><td>' +
+      return '<tr><td>' + UI.esc(c.first + ' ' + c.last) + (c.by === 'רכזת' || c.by === 'גננת' ? ' <span class="small muted">(בחרת בשמה)</span>' : '') + '</td><td>' +
         UI.esc(c.role) + '</td><td>' + UI.esc(c.itemName) + '</td><td>' + UI.money(c.price) + '</td><td>' +
         (r.closed ? '' : '<button class="del" data-id="' + UI.esc(c.id) + '" type="button">מחיקה</button>') + '</td></tr>';
     }).join('');
@@ -31,6 +31,7 @@
     show('#aEmpty', !r.choices.length);
     $('#onBehalf').href = 'index.html' + (API.MOCK ? location.search : '') + '#g=' + encodeURIComponent(g) + '&k=' + encodeURIComponent(k);
     show('#onBehalf', !r.closed);
+    $('#openAnother').href = staffUrl + (API.MOCK ? location.search : '');
     $('#waStaff2').href = 'https://wa.me/?text=' + encodeURIComponent(staffMsg(r.name));
     $('#mailStaff2').href = 'mailto:?subject=' + encodeURIComponent('משחק חדש לגן מצהר הלב 🕎 ' + r.name) + '&body=' + encodeURIComponent(staffMsg(r.name));
     $('#closeTitle').textContent = r.closed ? 'הסל סגור' : 'סגירת הסל';
