@@ -202,7 +202,7 @@
     drawBar();
     $('#catNote').textContent = note || (teacher
       ? 'בוחרת בשם עובדת מהקטלוג המודפס? כתבי את מספר המשחק בחיפוש.'
-      : 'בחרי משחק אחד לגן, עד 70 ש"ח. משחק שכבר נבחר בגן שלך נעול, כדי שלא יהיו כפולים.');
+      : 'בחרי משחק אחד לגן. משחק שכבר נבחר בגן שלך נעול, כדי שלא יהיו כפולים.');
     setErr('#catErr', '');
     section('s-cat');
     if (!S.cat) S.cat = UI.mountCatalog($('#catalog'), S.catalog, { taken: S.status.taken, mine: S.myItem, onPick: ask });
@@ -275,7 +275,7 @@
     var admin = teacher ? null : adminLinks()[st.id];
     show('#ganCard', !!admin);
     if (!admin) return;
-    var msg = 'צוות ' + st.name + ' יקר 🕎 צהר הלב מזמינה לכל אחת מכן משחק חדש לגן, עד 70 ש"ח! ' +
+    var msg = 'צוות ' + st.name + ' יקר 🕎 צהר הלב מזמינה לכל אחת מכן משחק חדש לגן, 6 עד 7 משחקים חדשים לכל גן! ' +
       'היכנסי, בחרי ' + st.city + ' ואת ' + st.name + ', ובחרי משחק אחד (' + C.DEADLINE_TEXT + '). המדריכה שלך תשמח לעזור בבחירה: ' + SITE;
     $('#gcName').textContent = st.name;
     $('#staffMsg').value = msg;

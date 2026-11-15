@@ -6,7 +6,7 @@
 
   function section(id) { ['s-admin', 's-bad'].forEach(function (s) { show('#' + s, s === id); }); window.scrollTo(0, 0); }
   function staffMsg(name) {
-    return 'צוות ' + name + ' יקר 🕎 צהר הלב מזמינה לכל אחת מכן משחק חדש לגן, עד 70 ש"ח! ' +
+    return 'צוות ' + name + ' יקר 🕎 צהר הלב מזמינה לכל אחת מכן משחק חדש לגן, 6 עד 7 משחקים חדשים לכל גן! ' +
       'היכנסי, בחרי את העיר ואת הגן, ובחרי משחק אחד (' + window.CONFIG.DEADLINE_TEXT + '). המדריכה שלך תשמח לעזור בבחירה: ' + staffUrl;
   }
 
