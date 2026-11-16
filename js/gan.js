@@ -24,7 +24,7 @@
       'הסל פתוח. העובדות נכנסות בקישור הכללי ובוחרות את ' + r.name + '.';
     var rows = r.choices.map(function (c) {
       return '<tr><td>' + UI.esc(c.first + ' ' + c.last) + (c.by === 'רכזת' || c.by === 'גננת' ? ' <span class="small muted">(בחרת בשמה)</span>' : '') + '</td><td>' +
-        UI.esc(c.role) + '</td><td>' + UI.esc(c.itemName) + '</td><td>' + UI.money(c.price) + '</td><td>' +
+        UI.esc(c.role) + '</td><td>' + UI.esc(c.itemName) + '</td><td>' +
         (r.closed ? '' : '<button class="del" data-id="' + UI.esc(c.id) + '" type="button">מחיקה</button>') + '</td></tr>';
     }).join('');
     $('#aRows').innerHTML = rows;

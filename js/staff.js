@@ -146,7 +146,7 @@
     if (Logic.norm(me.last).length < 2) return setErr('#idErr', 'חסר שם משפחה');
     if (!/^\d{4}$/.test(me.id4)) return setErr('#idErr', 'צריך בדיוק 4 ספרות אחרונות של תעודת הזהות');
     if (!me.role) return setErr('#idErr', 'בחרי תפקיד');
-    if (isGuide()) return setErr('#idErr', 'מדריכות לא בוחרות משחק. עזרי למודרכות שלך לבחור.');
+    if (isGuide()) return setErr('#idErr', 'תפקיד המדריכות הוא לעזור למודרכות לבחור. כל עובדת בוחרת בעצמה.');
     if (!ganId) return setErr('#idErr', 'בחרי עיר ואת הגן שלך');
     var opening = !teacher && ganId === NEW, ng = null;
     if (opening) {
@@ -216,7 +216,6 @@
     var sup = S.catalog.suppliers[it.s] ? S.catalog.suppliers[it.s].name : it.s;
     $('#mImg').src = it.i || it.t;
     $('#mTitle').textContent = it.n;
-    $('#mPrice').textContent = UI.money(it.p);
     $('#mSup').textContent = sup;
     $('#mQ').textContent = (S.myItem ? 'להחליף את הבחירה שלך למשחק הזה' : 'לבחור את המשחק הזה') + ' ' + UI.toGan(S.status.name) + '?';
     setErr('#mErr', '');
@@ -264,7 +263,7 @@
       : 'אפשר להחליף משחק עד שהרכזת סוגרת את הסל. מרים מזמינה את כל המשחקים, והם יגיעו לגן לפני חנוכה.';
     show('#changeBtn', !closed);
     $('#waBtn').href = 'https://wa.me/?text=' + encodeURIComponent('בחרתי את "' + gameName + '" ' + UI.toGan(st.name) +
-      ' במתנת החנוכה של צהר הלב 🕎\nגם את בצוות? היכנסי ובחרי משחק לגן שלך: ' + SITE);
+      ' בדמי החנוכה של צהר הלב 🕎\nגם את בצוות? היכנסי ובחרי משחק לגן שלך: ' + SITE);
     section('s-done');
     fillGanCard(st);
     if (celebrate) UI.confetti();

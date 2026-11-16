@@ -118,7 +118,7 @@ var UI = (function () {
         (it.no ? '<span class="no">' + it.no + '</span>' : '') +
         '<div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="' + esc(it.t) + '" alt=""></div>' +
         '<div class="b"><div class="n">' + esc(it.n) + '</div>' +
-        '<div class="meta"><span class="price">' + money(it.p) + '</span><span class="sup">' + esc(sup) + '</span></div>' +
+        '<div class="meta">' + (opts.readOnly ? '<span class="price">' + money(it.p) + '</span>' : '') + '<span class="sup">' + esc(sup) + '</span></div>' +
         (opts.readOnly ? '<div class="dom">' + esc(it.d) + '</div>' + (it.x ? '<div class="x">' + esc(it.x) + '</div>' : '') : '') +
         '<div class="go">' + btn + '<a href="' + esc(it.u) + '" target="_blank" rel="noopener">לפרטים באתר ' + esc(sup) + '</a></div></div></article>';
     }
@@ -168,7 +168,7 @@ var UI = (function () {
     x.direction = 'rtl'; x.textAlign = 'center'; x.fillStyle = '#00274D';
     try { var logo = await loadImg('img/logo.png'); x.drawImage(logo, 465, 60, 150, 159); } catch (e) { }
     x.font = '900 84px Heebo'; x.fillText('הדלקתי נר בגן!', 540, 330);
-    x.font = '500 44px Heebo'; x.fillStyle = '#45607A'; x.fillText('בחרתי משחק במתנת החנוכה של צהר הלב', 540, 400);
+    x.font = '500 44px Heebo'; x.fillStyle = '#45607A'; x.fillText('בחרתי משחק בדמי החנוכה של צהר הלב', 540, 400);
     var svg = chanukiah(o.lit, { shamash: true }).replace('class="chanukiah"', 'width="800" height="540"');
     try {
       var url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));

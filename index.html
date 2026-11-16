@@ -30,7 +30,7 @@
       <li>נכנסים עם השם ו-4 ספרות אחרונות של תעודת הזהות</li>
       <li>העו״סית רכזת הגן פותחת את הגן עם הכתובת, וכל הצוות בוחרות אותו מהרשימה</li>
       <li>כל אחת בוחרת משחק אחד מהקטלוג, ומדליקה נר בחנוכייה של הגן</li>
-      <li>המדריכות לא בוחרות משחק בעצמן. הן עוזרות למודרכות שלהן לבחור</li>
+      <li>תפקיד המדריכות משמעותי מאוד, הן עוזרות למודרכות שלהן לבחור</li>
     </ol>
     <div class="card hidden" id="myGans">
       <h2>הגנים שפתחת</h2>
@@ -52,8 +52,8 @@
         <small>רק כדי לוודא שכל אחת בוחרת פעם אחת. לא מבקשים את המספר המלא.</small></label>
       <label class="field"><span>תפקיד</span><select name="role" required></select></label>
       <div class="msg info hidden" id="guideNote">
-        <b>מדריכה יקרה, את לא צריכה לבחור משחק.</b><br>
-        התפקיד שלך הוא לעזור למודרכות שלך לבחור. שבי איתן מול הקטלוג, המליצי על משחק שמתאים לילדים בגן,
+        <b>מדריכה יקרה, התפקיד שלך משמעותי מאוד.</b><br>
+        את עוזרת למודרכות שלך לבחור. שבי איתן מול הקטלוג, המליצי על משחק שמתאים לילדים בגן,
         וכל אחת מהן נכנסת לקישור ובוחרת בעצמה.
         <div class="actions" style="margin-top:10px">
           <a class="btn small navy" href="catalog.pdf" target="_blank" rel="noopener">לקטלוג המשחקים</a>
@@ -73,7 +73,7 @@
             <label class="field"><span>טלפון לתיאום משלוח</span><input name="phone" inputmode="tel" maxlength="20" dir="ltr" style="text-align:right"></label>
             <label class="field"><span>כמה יבחרו משחק לגן?</span><input name="staff" type="number" min="1" max="20" inputmode="numeric" value="6"></label>
           </div>
-          <small class="muted">הגננת, הסייעות והמטפלות של הגן, ואת אם תבחרי משחק לגן הזה. המדריכה לא נספרת, כי היא לא בוחרת. לפי המספר הזה החנוכייה של הגן מתמלאת.</small>
+          <small class="muted">הגננת, הסייעות והמטפלות של הגן, ואת אם תבחרי משחק לגן הזה. בלי המדריכה, שעוזרת לצוות לבחור. לפי המספר הזה החנוכייה של הגן מתמלאת.</small>
         </div>
       </div>
       <div class="msg err" id="idErr" role="alert"></div>
@@ -145,7 +145,7 @@
   <div class="box">
     <img id="mImg" alt="" referrerpolicy="no-referrer">
     <h2 id="mTitle"></h2>
-    <p><b id="mPrice"></b> · <span id="mSup"></span></p>
+    <p><span id="mSup"></span></p>
     <p id="mQ"></p>
     <div class="msg err" id="mErr" role="alert"></div>
     <div class="actions" style="justify-content:center">
