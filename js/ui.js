@@ -119,8 +119,9 @@ var UI = (function () {
         '<div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="' + esc(it.t) + '" alt=""></div>' +
         '<div class="b"><div class="n">' + esc(it.n) + '</div>' +
         '<div class="meta">' + (opts.readOnly ? '<span class="price">' + money(it.p) + '</span>' : '') + '<span class="sup">' + esc(sup) + '</span></div>' +
-        (opts.readOnly ? '<div class="dom">' + esc(it.d) + '</div>' + (it.x ? '<div class="x">' + esc(it.x) + '</div>' : '') : '') +
-        '<div class="go">' + btn + '<a href="' + esc(it.u) + '" target="_blank" rel="noopener">לפרטים באתר ' + esc(sup) + '</a></div></div></article>';
+        (opts.readOnly ? '<div class="dom">' + esc(it.d) + '</div>' : '') + (it.x ? '<div class="x">' + esc(it.x) + '</div>' : '') +
+        // 16.11 Liba: staff never see prices, so no link to the supplier page (it shows the price); only Miriam's review page keeps it
+        '<div class="go">' + btn + (opts.readOnly ? '<a href="' + esc(it.u) + '" target="_blank" rel="noopener">לפרטים באתר ' + esc(sup) + '</a>' : '') + '</div></div></article>';
     }
     function draw() {
       var list = catalog.items.filter(function (i) {
