@@ -1,11 +1,13 @@
 // The one link for everyone: identify -> pick gan -> pick one game -> light a candle.
 // 11.11: the עו״סית רכזת opens the gan here (she may open several), מדריכות do not choose, they help their staff choose.
+// 22.11: staff who work in several gans pick one game for each gan, up to Logic.MAX_GANS (3).
 // Teacher mode: index.html#g=<ganId>&k=<key> lets the רכזת choose on behalf of a staff member.
 (function () {
   var $ = UI.$, show = UI.show, C = window.CONFIG;
   var hash = new URLSearchParams(location.hash.slice(1));
   var teacher = hash.get('g') && hash.get('k') ? { ganId: hash.get('g'), key: hash.get('k') } : null;
-  var S = { me: null, gan: null, status: null, catalog: null, cat: null, gans: null, pick: null, myItem: '' };
+  var S = { me: null, gan: null, status: null, catalog: null, cat: null, gans: null, pick: null, myItem: '', myGans: [] };
+  var MAX_GANS = Logic.MAX_GANS || 3;
   var SITE = location.href.split('#')[0].split('?')[0].replace(/index\.html$/, '');
 
   function section(id) {
@@ -173,10 +175,15 @@
         drawMyGans();
         return opened({ id: reg.ganId, name: reg.name || ng.name, city: ng.city });
       }
-      var mine = await API.call('myChoice', me);
+      var mine = await API.call('myChoice', Object.assign({ ganId: ganId }, me));
       if (!mine.ok) return setErr('#idErr', mine.msg);
-      if (mine.found && mine.ganId !== ganId) {
-        return setErr('#idErr', 'כבר בחרת משחק ' + UI.toGan(mine.ganName) + ' (' + mine.itemName + '). כל אחת בוחרת פעם אחת.');
+      var mineList = mine.choices || (mine.found ? [mine] : []);
+      var here = mineList.filter(function (c) { return c.ganId === ganId; })[0] || null;
+      mine = here ? Object.assign({ found: true }, here) : { found: false };
+      S.myGans = mineList;
+      if (!here && mineList.length >= MAX_GANS) {
+        return setErr('#idErr', 'אפשר לבחור משחק לעד ' + MAX_GANS + ' גנים, וכבר בחרת ' + gansText(mineList) +
+          '. כדי להחליף משחק באחד מהם, בחרי את הגן הזה ברשימה.');
       }
       var st = await API.call('ganStatus', { ganId: ganId });
       if (!st.ok) return setErr('#idErr', st.msg);
@@ -189,6 +196,10 @@
       await openCatalog(mine.found ? 'כבר בחרת את "' + mine.itemName + '". אפשר להחליף למשחק אחר עד שהרכזת סוגרת את הסל.' : '');
     } finally { $('#idSubmit').disabled = false; }
   });
+
+  function gansText(list) {
+    return list.map(function (c) { return UI.toGan(c.ganName); }).join(', ');
+  }
 
   function drawBar() {
     var st = S.status;
@@ -246,6 +257,8 @@
     closeModal();
     S.status.chosen = r.chosen;
     S.myItem = it.id;
+    S.myGans = S.myGans.filter(function (c) { return c.ganId !== S.status.id; })
+      .concat([{ ganId: S.status.id, ganName: S.status.name, city: S.status.city, itemId: it.id, itemName: it.n }]);
     done(it.n, !r.same, false);
   });
 
@@ -262,6 +275,13 @@
       ? 'הרכזת כבר סגרה את הסל. מרים מזמינה את כל המשחקים, והם יגיעו לגן לפני חנוכה.'
       : 'אפשר להחליף משחק עד שהרכזת סוגרת את הסל. מרים מזמינה את כל המשחקים, והם יגיעו לגן לפני חנוכה.';
     show('#changeBtn', !closed);
+    var others = (S.myGans || []).filter(function (c) { return c.ganId !== st.id; });
+    $('#doneOthers').textContent = others.length ? 'בחרת גם ' + others.map(function (c) {
+      return UI.toGan(c.ganName) + ' (' + c.itemName + ')'; }).join(', ') + '.' : '';
+    show('#doneOthers', others.length > 0);
+    var canMore = !teacher && (S.myGans || []).length < MAX_GANS;
+    show('#moreGan', canMore);
+    $('#moreGanBtn').textContent = (S.myGans || []).length > 1 ? 'לבחירת משחק לגן נוסף' : 'עובדת גם בגן נוסף? לבחירת משחק לגן שני';
     $('#waBtn').href = 'https://wa.me/?text=' + encodeURIComponent('בחרתי את "' + gameName + '" ' + UI.toGan(st.name) +
       ' בדמי החנוכה של צהר הלב 🕎\nגם את בצוות? היכנסי ובחרי משחק לגן שלך: ' + SITE);
     section('s-done');
@@ -308,6 +328,14 @@
 
   $('#copyStaff').addEventListener('click', function (e) { UI.copyText($('#staffMsg').value, e.target); });
   $('#copyAdmin').addEventListener('click', function (e) { UI.copyText($('#toAdmin').href, e.target); });
+
+  // Back to the form with the same details, to pick the next gan she works in.
+  $('#moreGanBtn').addEventListener('click', function () {
+    section('s-id');
+    f.gan.value = ''; toggleNew();
+    $('#ganHint').textContent = 'בחרי את העיר ואת הגן הנוסף שלך. בכל גן בוחרים משחק אחד, עד ' + MAX_GANS + ' גנים.';
+    f.city.focus();
+  });
 
   $('#changeBtn').addEventListener('click', function () {
     API.call('ganStatus', { ganId: S.status.id }).then(function (st) {

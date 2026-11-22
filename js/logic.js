@@ -8,6 +8,7 @@
  */
 var Logic = (function () {
   var MAX_PRICE = 70;
+  var MAX_GANS = 3;           // 22.11 Liba: staff who work in several gans pick one game for each, up to 3 gans
   var GUIDE_ROLE = 'מדריכה';   // 11.11: מדריכות help their staff choose, they do not choose a game
   var CITIES = ['באר שבע', 'דימונה', 'נתיבות', 'אופקים', 'ערד', 'ירוחם', 'אחר'];
 
@@ -114,24 +115,29 @@ var Logic = (function () {
     if (norm(last).length < 2) return err('last', 'חסר שם משפחה');
     if (!/^\d{4}$/.test(id4)) return err('id4', 'צריך 4 ספרות אחרונות של תעודת הזהות');
     if (!role) return err('role', 'חסר תפקיד');
-    if (norm(role) === norm(GUIDE_ROLE)) return err('guide', 'מדריכות לא בוחרות משחק. עזרי למודרכות שלך לבחור.');
+    if (norm(role) === norm(GUIDE_ROLE)) return err('guide', 'תפקיד המדריכות הוא לעזור למודרכות לבחור. כל עובדת בוחרת בעצמה.');
     if (!item || !item.id) return err('item', 'המשחק לא נמצא בקטלוג');
     if (!(item.p > 0 && item.p <= MAX_PRICE)) return err('price', 'המחיר מעל ' + MAX_PRICE + ' ש"ח');
 
+    // One game per person per gan; a person who works in several gans picks for each of them, up to MAX_GANS.
     var key = personKey(first, last, id4);
-    var mine = null, ops = [];
+    var mine = null, ops = [], myGans = {};
     var all = active(db);
     for (var i = 0; i < all.length; i++) {
       var c = all[i];
-      if (personKey(c.first, c.last, c.id4) === key) mine = c;
+      if (personKey(c.first, c.last, c.id4) !== key) continue;
+      myGans[c.ganId] = 1;
+      if (c.ganId === g.id) mine = c;
     }
-    if (mine && mine.ganId !== g.id) {
-      var og = findGan(db, mine.ganId);
-      var on = og ? og.name : '';
-      return err('othergan', 'כבר בחרת משחק ' + (/^גן[\s״"']/.test(on) ? 'ל' + on : 'לגן ' + on) + '. כל אחת בוחרת פעם אחת.');
+    var nGans = Object.keys(myGans).length;
+    if (!mine && nGans >= MAX_GANS) {
+      var names = Object.keys(myGans).map(function (id) { var x = findGan(db, id); return x ? x.name : id; });
+      return err('maxgans', 'אפשר לבחור משחק לעד ' + MAX_GANS + ' גנים, וכבר בחרת ל: ' + names.join(', ') +
+        '. כדי להחליף משחק באחד מהם, בחרי את הגן הזה ברשימה.');
     }
     if (mine && mine.itemId === item.id) {
-      return { res: { ok: true, same: true, choiceId: mine.id, chosen: active(db, g.id).length, staff: g.staff, ganName: g.name }, ops: [] };
+      return { res: { ok: true, same: true, choiceId: mine.id, chosen: active(db, g.id).length, staff: g.staff, ganName: g.name,
+        myGans: nGans, maxGans: MAX_GANS }, ops: [] };
     }
     for (var j = 0; j < all.length; j++) {
       if (all[j].ganId === g.id && all[j].itemId === item.id && all[j] !== mine) {
@@ -144,20 +150,23 @@ var Logic = (function () {
       by: byTeacher ? 'רכזת' : 'עובדת', status: 'פעיל' };
     ops.push({ t: 'addChoice', row: row });
     var chosen = active(db, g.id).length + (mine ? 0 : 1);
-    return { res: { ok: true, replaced: !!mine, choiceId: row.id, chosen: chosen, staff: g.staff, ganName: g.name }, ops: ops };
+    return { res: { ok: true, replaced: !!mine, choiceId: row.id, chosen: chosen, staff: g.staff, ganName: g.name,
+      myGans: nGans + (mine ? 0 : 1), maxGans: MAX_GANS }, ops: ops };
   }
 
+  // All of a person's active choices (one per gan). With p.ganId, found/itemId/... describe the choice in that gan;
+  // without it (old pages) they describe the first choice, as before.
   function myChoice(db, p) {
     var key = personKey(p.first, p.last, p.id4);
-    var all = active(db);
-    for (var i = 0; i < all.length; i++) {
-      if (personKey(all[i].first, all[i].last, all[i].id4) === key) {
-        var g = findGan(db, all[i].ganId);
-        return { res: { ok: true, found: true, ganId: all[i].ganId, ganName: g ? g.name : '', itemId: all[i].itemId,
-          itemName: all[i].itemName, closed: g ? !!g.closed : false }, ops: [] };
-      }
-    }
-    return { res: { ok: true, found: false }, ops: [] };
+    var list = active(db).filter(function (c) { return personKey(c.first, c.last, c.id4) === key; }).map(function (c) {
+      var g = findGan(db, c.ganId);
+      return { ganId: c.ganId, ganName: g ? g.name : '', city: g ? g.city : '', itemId: c.itemId, itemName: c.itemName,
+        closed: g ? !!g.closed : false };
+    });
+    var here = p.ganId ? list.filter(function (c) { return c.ganId === p.ganId; })[0] : list[0];
+    var res = { ok: true, found: !!here, choices: list, maxGans: MAX_GANS };
+    if (here) for (var k in here) res[k] = here[k];
+    return { res: res, ops: [] };
   }
 
   function removeChoice(db, p) {
@@ -206,7 +215,7 @@ var Logic = (function () {
     }
   }
 
-  return { MAX_PRICE: MAX_PRICE, CITIES: CITIES, norm: norm, personKey: personKey, handle: handle, applyOps: applyOps };
+  return { MAX_PRICE: MAX_PRICE, MAX_GANS: MAX_GANS, CITIES: CITIES, norm: norm, personKey: personKey, handle: handle, applyOps: applyOps };
 })();
 
 if (typeof module !== 'undefined') module.exports = Logic;
