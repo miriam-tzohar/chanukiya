@@ -10,6 +10,20 @@
       'היכנסי, בחרי את העיר ואת הגן, ובחרי משחק אחד (' + window.CONFIG.DEADLINE_TEXT + '). המדריכה שלך תשמח לעזור בבחירה: ' + staffUrl;
   }
 
+  // In-page yes/no box. 25.11: window.confirm() is silently blocked (returns false) in some in-app and filtered
+  // phone browsers, so the close button "did nothing" for a רכזת with a 7/7 gan.
+  function askBox(q, yes) {
+    return new Promise(function (resolve) {
+      $('#askQ').textContent = q;
+      $('#askYes').textContent = yes || 'כן';
+      show('#ask', true);
+      function end(v) { show('#ask', false); $('#askYes').onclick = $('#askNo').onclick = null; resolve(v); }
+      $('#askYes').onclick = function () { end(true); };
+      $('#askNo').onclick = function () { end(false); };
+      $('#askYes').focus();
+    });
+  }
+
   var A = null;
   async function loadAdmin(g, k) {
     var r = await API.call('ganAdmin', { ganId: g, key: k });
@@ -40,8 +54,10 @@
     $('#closeBtn').textContent = r.closed ? 'פתיחת הסל מחדש' : 'סגירת הסל של הגן';
     $('#aRows').querySelectorAll('.del').forEach(function (b) {
       b.addEventListener('click', async function () {
-        if (!confirm('למחוק את הבחירה הזו? העובדת תוכל לבחור שוב.')) return;
+        if (!(await askBox('למחוק את הבחירה הזו? העובדת תוכל לבחור שוב.', 'כן, למחוק'))) return;
+        b.disabled = true;
         var x = await API.call('removeChoice', { ganId: g, key: k, choiceId: b.dataset.id });
+        b.disabled = false;
         if (!x.ok) $('#aErr').textContent = x.msg; else loadAdmin(g, k);
       });
     });
@@ -50,14 +66,22 @@
 
   $('#closeBtn').addEventListener('click', async function () {
     if (!A) return;
-    var closing = !A.d.closed;
+    var closing = !A.d.closed, btn = $('#closeBtn');
+    $('#aErr').textContent = '';
     if (closing) {
       var missing = A.d.staff - A.d.chosen;
       var q = missing > 0 ? 'עוד ' + missing + ' בצוות לא בחרו. לסגור בכל זאת?' : 'לסגור את הסל? אחרי הסגירה אי אפשר להחליף.';
-      if (!confirm(q)) return;
+      if (!(await askBox(q, 'כן, לסגור את הסל'))) return;
     }
+    btn.disabled = true;
+    btn.textContent = closing ? 'סוגרת את הסל...' : 'פותחת מחדש...';
     var r = await API.call(closing ? 'closeGan' : 'reopenGan', { ganId: A.g, key: A.k });
-    if (!r.ok) { $('#aErr').textContent = r.msg; return; }
+    btn.disabled = false;
+    if (!r.ok) {
+      btn.textContent = closing ? 'סגירת הסל של הגן' : 'פתיחת הסל מחדש';
+      $('#aErr').textContent = r.msg;
+      return;
+    }
     if (closing) UI.confetti();
     loadAdmin(A.g, A.k);
   });

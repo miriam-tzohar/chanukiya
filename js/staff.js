@@ -208,9 +208,21 @@
     $('#barChan').innerHTML = UI.chanukiah(UI.litFor(st.chosen, st.staff));
   }
 
+  // 25.11: a full gan (e.g. 7/7) is closed only from the רכזת's admin link; the staff page has no close button.
+  function fullNote(el, st) {
+    var gn = String(st.name || '').trim();
+    if (!/^גן[\s״"']/.test(gn)) gn = 'גן ' + gn;
+    var t = (teacher || st.closed || st.chosen < st.staff || adminLinks()[st.id]) ? '' :
+      'כל הצוות ב' + gn + ' בחר! 🎉 את הסל סוגרת העו״סית רכזת הגן, בקישור הניהול שקיבלה כשפתחה את הגן. ' +
+      'את הרכזת והקישור לא אצלך? פני למרים.';
+    $(el).textContent = t;
+    show(el, !!t);
+  }
+
   async function openCatalog(note) {
     S.catalog = S.catalog || await API.loadCatalog();
     drawBar();
+    fullNote('#catFull', S.status);
     $('#catNote').textContent = note || (teacher
       ? 'בוחרת בשם עובדת מהקטלוג המודפס? כתבי את מספר המשחק בחיפוש.'
       : 'בחרי משחק אחד לגן. משחק שכבר נבחר בגן שלך נעול, כדי שלא יהיו כפולים.');
@@ -275,6 +287,7 @@
       ? 'הרכזת כבר סגרה את הסל. מרים מזמינה את כל המשחקים, והם יגיעו לגן לפני חנוכה.'
       : 'אפשר להחליף משחק עד שהרכזת סוגרת את הסל. מרים מזמינה את כל המשחקים, והם יגיעו לגן לפני חנוכה.';
     show('#changeBtn', !closed);
+    fullNote('#doneFull', st);
     var others = (S.myGans || []).filter(function (c) { return c.ganId !== st.id; });
     $('#doneOthers').textContent = others.length ? 'בחרת גם ' + others.map(function (c) {
       return UI.toGan(c.ganName) + ' (' + c.itemName + ')'; }).join(', ') + '.' : '';
